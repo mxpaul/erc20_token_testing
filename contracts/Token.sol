@@ -39,10 +39,10 @@ contract Token is ERC20 {
         _;
     }
 
-    function Token() public {
+    constructor(address o1, address o2) public {
         totalSupply = 10000000000000000000000000;
-        owner = 0x1FC11ac635e89c228765f3e6aEe0970D9aFf2BF5;
-        owner2 = 0x4AB9AA258369438bC146b26af02F6E3568009D92;
+        owner = o1;
+        owner2 = o2;
         balances[owner] = totalSupply;
     }
 
@@ -65,7 +65,7 @@ contract Token is ERC20 {
         require(balances[msg.sender] >= _value);           // Check if the sender has enough
         balances[msg.sender] -= _value;                    // Subtract from the sender
         balances[_to] += _value;                           // Add the same to the recipient
-        Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, _to, _value);
     return true;
     }
 
@@ -76,7 +76,7 @@ contract Token is ERC20 {
             balances[_from] -= _amount;
             balances[_to] += _amount;
             allowed[_from][msg.sender] -= _amount;
-            Transfer(_from, _to, _amount);
+            emit Transfer(_from, _to, _amount);
             return true;
         }
         else {
@@ -86,7 +86,7 @@ contract Token is ERC20 {
 
     function approve(address _spender, uint _value) public  returns (bool success){
         allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
     return true;
     }
 
