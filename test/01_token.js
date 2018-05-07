@@ -1,16 +1,17 @@
-var Token = artifacts.require("Token");
+const Token = artifacts.require("Token");
+const hardcodedTotalSupply = 10000000000000000000000000;
 
 contract('Token constructor', function(accounts) {
-	let acc = { owner1: accounts[0], owner2: accounts[1], nobody: accounts[9]};
-	let hardcodedTotalSupply = 10000000000000000000000000;
+	const acc = { owner1: accounts[0], owner2: accounts[1], nobody: accounts[9]};
 	let token;
 
-	it('should have name and symbol set to string("MMS")', async() => {
+	it('should deploy")', async() => {
 		token = await Token.new(acc.owner1, acc.owner2, {from: acc.owner1});
-		let name = await token.name();
-		let symbol = await token.name();
-		assert.equal(name, 'MMS');
-		assert.equal(symbol, 'MMS');
+	});
+
+	it('should have name and symbol set to string("MMS")', async() => {
+		assert.equal(await token.name(), 'MMS');
+		assert.equal(await token.symbol(), 'MMS');
 	});
 
 	it('should have owner and owner2 set to what passed via constructor', async() => {
