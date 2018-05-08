@@ -37,10 +37,15 @@ contract('Token constructor', function(accounts) {
 		assert.equal(await token.balanceOf(acc.owner2), 0);
 		assert.equal(await token.balanceOf(acc.nobody), 0);
 	});
+	it('should have zero investBalances for any user', async() => {
+		assert.equal(await token.investBalances(acc.owner1), 0);
+		assert.equal(await token.investBalances(acc.owner2), 0);
+		assert.equal(await token.investBalances(acc.nobody), 0);
+	});
 });
 
 contract('Token add_tokens', function(accounts) {
-	const acc = {owner1: accounts[0], owner2: accounts[1], nobody: accounts[9]};
+	const acc = {owner1: accounts[0], owner2: accounts[1], nobody: accounts[9], goodguy: accounts[3]};
 	let token;
 
 	it('should deploy")', async() => {
@@ -50,4 +55,46 @@ contract('Token add_tokens', function(accounts) {
 	it('should throw when caller is not owner")', async() => {
 		expectThrow(token.add_tokens(acc.nobody, 100,{from: acc.nobody}));
 	});
+
+	it('should transfer tokens from owner balance to goodguy investBalance")', async() => {
+		const amount = 100;
+
+		let o1_before = (await token.balanceOf(acc.owner1)).toNumber();
+		let gg_before = (await token.investBalances(acc.goodguy)).toNumber();
+		let want_o1 = o1_before - amount;
+		let want_gg = gg_before + amount;
+
+		await token.add_tokens(acc.goodguy, amount, {from: acc.owner1});
+		let got_o1 = (await token.balanceOf(acc.owner1)).toNumber();
+		let got_gg = (await token.investBalances(acc.goodguy)).toNumber();
+		assert.equal(got_o1, want_o1);
+		assert.equal(got_gg, want_gg);
+	});
+
+	it('should transfer tokens from owner balance to goodguy investBalance when called by owner2")', async() => {
+		const amount = 100;
+
+		let o1_before = (await token.balanceOf(acc.owner1)).toNumber();
+		let gg_before = (await token.investBalances(acc.goodguy)).toNumber();
+		let want_o1 = o1_before - amount;
+		let want_gg = gg_before + amount;
+
+		let want_o2_balance = (await token.balanceOf(acc.owner2)).toNumber();
+		let want_o2_inv_balance = (await token.investBalances(acc.owner2)).toNumber();
+
+		await token.add_tokens(acc.goodguy, amount, {from: acc.owner2});
+		let got_o1 = (await token.balanceOf(acc.owner1)).toNumber();
+		let got_gg = (await token.investBalances(acc.goodguy)).toNumber();
+		assert.equal(got_o1, want_o1);
+		assert.equal(got_gg, want_gg);
+
+		let got_o2_balance = (await token.balanceOf(acc.owner2)).toNumber();
+		let got_o2_inv_balance = (await token.investBalances(acc.owner2)).toNumber();
+		assert.equal(want_o2_balance, got_o2_balance);
+		assert.equal(want_o2_inv_balance, got_o2_inv_balance);
+	});
+
+	// Here goes test where any owner able to create more tokens then initial supply by calling 
+	// token.add_token(acc.owner1, token.balanceOf(acc.owner1) + token.totalSupply());
+ )
 });
