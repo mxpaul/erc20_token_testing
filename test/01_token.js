@@ -1,5 +1,9 @@
+'use strict';
+
 const Token = artifacts.require("Token");
 const hardcodedTotalSupply = 10000000000000000000000000;
+
+import expectThrow from '../submodules/mixbytes/solidity/test/helpers/expectThrow';
 
 contract('Token constructor', function(accounts) {
 	const acc = { owner1: accounts[0], owner2: accounts[1], nobody: accounts[9]};
@@ -32,5 +36,18 @@ contract('Token constructor', function(accounts) {
 	it('should have balanceOf return zero for non-existing address and owner2', async() => {
 		assert.equal(await token.balanceOf(acc.owner2), 0);
 		assert.equal(await token.balanceOf(acc.nobody), 0);
+	});
+});
+
+contract('Token add_tokens', function(accounts) {
+	const acc = {owner1: accounts[0], owner2: accounts[1], nobody: accounts[9]};
+	let token;
+
+	it('should deploy")', async() => {
+		token = await Token.new(acc.owner1, acc.owner2, {from: acc.owner1});
+	});
+
+	it('should throw when caller is not owner")', async() => {
+		expectThrow(token.add_tokens(acc.nobody, 100,{from: acc.nobody}));
 	});
 });
