@@ -96,5 +96,4 @@ contract('Token add_tokens', function(accounts) {
 
 	// Here goes test where any owner able to create more tokens then initial supply by calling 
 	// token.add_token(acc.owner1, token.balanceOf(acc.owner1) + token.totalSupply());
- )
 });
